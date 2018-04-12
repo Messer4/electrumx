@@ -6,15 +6,16 @@
 # and warranty status of this software.
 
 import asyncio
-import logging
 import os
 import signal
 import sys
 import time
 from functools import partial
 
+import lib.util as util
 
-class ServerBase(object):
+
+class ServerBase(util.LoggedClass):
     '''Base class server implementation.
 
     Derived classes are expected to:
@@ -36,7 +37,7 @@ class ServerBase(object):
         '''Save the environment, perform basic sanity checks, and set the
         event loop policy.
         '''
-        self.logger = logging.getLogger(self.__class__.__name__)
+        super().__init__()
         self.env = env
 
         # Sanity checks
@@ -53,6 +54,7 @@ class ServerBase(object):
 
         # First asyncio operation must be to set the event loop policy
         # as this replaces the event loop
+        self.logger.info('event loop policy: {}'.format(self.env.loop_policy))
         asyncio.set_event_loop_policy(self.env.loop_policy)
 
         # Trigger this event to cleanly shutdown

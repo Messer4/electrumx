@@ -407,6 +407,7 @@ class BitcoinCash(BitcoinMixin, Coin):
     TX_COUNT_HEIGHT = 479636
     TX_PER_BLOCK = 50
     PEERS = [
+        'electrum-abc.criptolayer.net s50012',
         'electroncash.cascharia.com s50002',
         'bch.arihanc.com t52001 s52002',
         'bccarihace4jdcnt.onion t52001 s52002',
@@ -414,8 +415,6 @@ class BitcoinCash(BitcoinMixin, Coin):
         'abc.vom-stausee.de t52001 s52002',
         'abc1.hsmiths.com t60001 s60002',
         'electroncash.checksum0.com s t',
-        'electron.jns.im s t',
-        'electrumx-cash.1209k.com s t',
     ]
 
 
@@ -430,12 +429,15 @@ class BitcoinSegwit(BitcoinMixin, Coin):
         'E-X.not.fyi s t',
         'elec.luggs.co s443',
         'electrum.vom-stausee.de s t',
-        'electrum3.hachre.de s t',
+        'electrum3.hachre.de p10000 s t',
         'electrum.hsmiths.com s t',
+        'erbium1.sytes.net s t',
         'helicarrier.bauerj.eu s t',
         'hsmiths4fyqlw5xw.onion s t',
         'luggscoqbymhvnkp.onion t80',
         'ozahtqwp25chjdjd.onion s t',
+        'us11.einfachmalnettsein.de s t',
+        'ELEX01.blackpole.online s t',
         'node.arihanc.com s t',
         'arihancckjge66iv.onion s t',
     ]
@@ -510,6 +512,21 @@ class BitcoinGoldRegtest(BitcoinGold):
     TX_COUNT_HEIGHT = 1
     NET = 'regtest'
     RPC_PORT = 18444
+    GENESIS_HASH = ('0f9188f13cb7b2c71f2a335e3a4fc328'
+                    'bf5beb436012afca590b1a11466e2206')
+
+class BitcoinCashRegtest(BitcoinCash):
+    SHORTNAME = "BCCRG"
+    XPUB_VERBYTES = bytes.fromhex("0488B21E")
+    XPRV_VERBYTES = bytes.fromhex("0488ADE4")
+    P2PKH_VERBYTE = bytes.fromhex("6F")
+    P2SH_VERBYTES = [bytes.fromhex("C4")]
+    WIF_BYTE = bytes.fromhex("EF")   
+    NET = 'regtest'
+    RPC_PORT = 22011
+    TX_COUNT = 0
+    TX_COUNT_HEIGHT = 1
+    RPC_PORT = 22011
     GENESIS_HASH = ('0f9188f13cb7b2c71f2a335e3a4fc328'
                     'bf5beb436012afca590b1a11466e2206')
 
@@ -1252,7 +1269,8 @@ class Fujicoin(Coin):
     WIF_BYTE = bytes.fromhex("a4")
     GENESIS_HASH = ('adb6d9cfd74075e7f91608add4bd2a2e'
                     'a636f70856183086842667a1597714a0')
-    DESERIALIZER = lib_tx.DeserializerSegWit
+    ESTIMATE_FEE = 0.001
+    RELAY_FEE = 0.001
     TX_COUNT = 170478
     TX_COUNT_HEIGHT = 1521676
     TX_PER_BLOCK = 1
@@ -1417,7 +1435,6 @@ class Feathercoin(Coin):
     WIF_BYTE = bytes.fromhex("8E")
     GENESIS_HASH = ('12a765e31ffd4059bada1e25190f6e98'
                     'c99d9714d334efa41a195a7e7e04bfe2')
-    DESERIALIZER = lib_tx.DeserializerSegWit
     TX_COUNT = 3170843
     TX_COUNT_HEIGHT = 1981777
     TX_PER_BLOCK = 2

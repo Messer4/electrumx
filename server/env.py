@@ -8,7 +8,6 @@
 '''Class for handling environment configuration and defaults.'''
 
 
-import re
 import resource
 from collections import namedtuple
 from ipaddress import ip_address
@@ -16,6 +15,7 @@ from ipaddress import ip_address
 from lib.coins import Coin
 from lib.env_base import EnvBase
 import lib.util as lib_util
+import server.version as version
 
 
 NetIdentity = namedtuple('NetIdentity', 'host tcp_port ssl_port nick_suffix')
@@ -67,7 +67,6 @@ class Env(EnvBase):
         self.max_session_subs = self.integer('MAX_SESSION_SUBS', 50000)
         self.bandwidth_limit = self.integer('BANDWIDTH_LIMIT', 2000000)
         self.session_timeout = self.integer('SESSION_TIMEOUT', 600)
-        self.drop_client = self.custom("DROP_CLIENT", None, re.compile)
 
         # Identities
         clearnet_identity = self.clearnet_identity()
@@ -85,9 +84,9 @@ class Env(EnvBase):
         # We give the DB 250 files; allow ElectrumX 100 for itself
         value = max(0, min(env_value, nofile_limit - 350))
         if value < env_value:
-            self.logger.warning('lowered maximum sessions from {:,d} to {:,d} '
-                                'because your open file limit is {:,d}'
-                                .format(env_value, value, nofile_limit))
+            self.log_warning('lowered maximum sessions from {:,d} to {:,d} '
+                             'because your open file limit is {:,d}'
+                             .format(env_value, value, nofile_limit))
         return value
 
     def clearnet_identity(self):
@@ -145,10 +144,21 @@ class Env(EnvBase):
             '_tor',
         )
 
-    def hosts_dict(self):
-        return {identity.host: {'tcp_port': identity.tcp_port,
-                                'ssl_port': identity.ssl_port}
-                for identity in self.identities}
+    def server_features(self):
+        '''Return the server features dictionary.'''
+        hosts = {identity.host: {'tcp_port': identity.tcp_port,
+                                 'ssl_port': identity.ssl_port}
+                 for identity in self.identities}
+
+        return {
+            'hosts': hosts,
+            'pruning': None,
+            'server_version': version.VERSION,
+            'protocol_min': version.PROTOCOL_MIN,
+            'protocol_max': version.PROTOCOL_MAX,
+            'genesis_hash': self.coin.GENESIS_HASH,
+            'hash_function': 'sha256',
+        }
 
     def peer_discovery_enum(self):
         pd = self.default('PEER_DISCOVERY', 'on').strip().lower()

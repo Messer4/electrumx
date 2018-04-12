@@ -10,24 +10,24 @@ daemon.'''
 
 import asyncio
 import json
-import logging
 import time
+import traceback
 from calendar import timegm
 from struct import pack
 from time import strptime
 
 import aiohttp
 
-from lib.util import int_to_varint, hex_to_bytes
+from lib.util import LoggedClass, int_to_varint, hex_to_bytes
 from lib.hash import hex_str_to_hash
-from aiorpcx import JSONRPC
+from lib.jsonrpc import JSONRPC
 
 
 class DaemonError(Exception):
     '''Raised when the daemon returns an error in its results.'''
 
 
-class Daemon(object):
+class Daemon(LoggedClass):
     '''Handles connections to a daemon at the given URL.'''
 
     WARMING_UP = -28
@@ -37,7 +37,7 @@ class Daemon(object):
         '''Raised when the daemon returns an error in its results.'''
 
     def __init__(self, env):
-        self.logger = logging.getLogger(self.__class__.__name__)
+        super().__init__()
         self.coin = env.coin
         self.set_urls(env.coin.daemon_urls(env.daemon_url))
         self._height = None
@@ -151,8 +151,8 @@ class Daemon(object):
                 log_error('starting up checking blocks.')
             except (asyncio.CancelledError, DaemonError):
                 raise
-            except Exception as e:
-                self.logger.exception(f'uncaught exception: {e}')
+            except Exception:
+                self.log_error(traceback.format_exc())
 
             await asyncio.sleep(secs)
             secs = min(max_secs, secs * 2, 1)
